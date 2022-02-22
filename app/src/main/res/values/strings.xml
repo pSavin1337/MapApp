@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MapApp</string>
+    <string name="alert_dialog_title">Location Permission Needed</string>
+    <string name="alert_dialog_message">This app needs the Location permission, please accept to use location functionality</string>
+    <string name="positive_button_text">OK</string>
+    <string name="permission_denied_text">permission denied</string>
+    <string name="add_marker_button_text">add marker</string>
 </resources>
