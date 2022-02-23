@@ -29,6 +29,10 @@ class MapViewModel : ViewModel() {
         markersOptions.value = markersRepository.getMarkersList()
     }
 
+    fun onDeleteButtonClick() {
+        markersRepository.clearMarkersStorage()
+    }
+
     fun onRequestPermissionsResult(
         requestCode: Int,
         grantResults: IntArray

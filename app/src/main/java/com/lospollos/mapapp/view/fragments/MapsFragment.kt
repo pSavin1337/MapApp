@@ -37,7 +37,6 @@ import com.lospollos.mapapp.viewmodels.MapViewModel
 class MapsFragment : Fragment() {
 
     private lateinit var googleMap: GoogleMap
-    //private var mCurrLocationMarker: Marker? = null
     private var mFusedLocationClient: FusedLocationProviderClient? = null
     private lateinit var mapViewModel: MapViewModel
     private val markers = ArrayList<Marker>()
@@ -58,6 +57,13 @@ class MapsFragment : Fragment() {
             markersOptionsList.forEach {
                 markers.add(googleMap.addMarker(it)!!)
             }
+        }
+
+        val deleteMarkersButton = activity?.findViewById<Button>(R.id.delete_markers_button)
+        deleteMarkersButton?.setOnClickListener {
+            markers.clear()
+            mapViewModel.onDeleteButtonClick()
+            googleMap.clear()
         }
 
         mFusedLocationClient?.lastLocation?.addOnSuccessListener(activity!!) { location ->

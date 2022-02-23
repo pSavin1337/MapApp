@@ -5,4 +5,5 @@
     <string name="positive_button_text">OK</string>
     <string name="permission_denied_text">permission denied</string>
     <string name="add_marker_button_text">add marker</string>
+    <string name="delete_markers_button_text">delete all markers</string>
 </resources>
