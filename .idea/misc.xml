@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/TheEmperorPavel-II/AndroidStudioProjects/MapApp/app/src/main/res/layout/activity_main.xml" value="0.17481884057971014" />
+        <entry key="..\:/Users/TheEmperorPavel-II/AndroidStudioProjects/MapApp/app/src/main/res/layout/fragment_all_markers.xml" value="0.18" />
         <entry key="..\:/Users/TheEmperorPavel-II/AndroidStudioProjects/MapApp/app/src/main/res/layout/fragment_maps.xml" value="0.15" />
+        <entry key="..\:/Users/TheEmperorPavel-II/AndroidStudioProjects/MapApp/app/src/main/res/layout/recycler_view_markers_item.xml" value="0.1" />
       </map>
     </option>
   </component>

@@ -9,5 +9,14 @@
         android:id="@+id/mapsFragment"
         android:name="com.lospollos.mapapp.view.fragments.MapsFragment"
         android:label="fragment_maps"
-        tools:layout="@layout/fragment_maps" />
+        tools:layout="@layout/fragment_maps" >
+        <action
+            android:id="@+id/action_mapsFragment_to_allMarkersFragment"
+            app:destination="@id/allMarkersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/allMarkersFragment"
+        android:name="com.lospollos.mapapp.view.fragments.AllMarkersFragment"
+        android:label="fragment_all_markers"
+        tools:layout="@layout/fragment_all_markers" />
 </navigation>

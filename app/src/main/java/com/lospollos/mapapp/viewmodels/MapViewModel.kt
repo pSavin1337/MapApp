@@ -17,15 +17,24 @@ import com.lospollos.mapapp.data.MarkersRepository
 class MapViewModel : ViewModel() {
 
     private val markersRepository = MarkersRepository()
+    lateinit var markersList: List<Marker>
 
     val markersOptions = MutableLiveData<List<MarkerOptions>>()
     val permissionsGranted = MutableLiveData<Boolean>()
 
-    fun onFragmentDestroy(markers: List<Marker>) {
+    fun onAllMarkersButtonClick(currentMarkers: List<Marker>) {
+        markersRepository.saveMarkersList(currentMarkers)
+    }
+
+    fun onFragmentPause(markers: List<Marker>) {
         markersRepository.saveMarkersList(markers)
     }
 
     fun onMapCreate() {
+        markersOptions.value = markersRepository.getMarkersList()
+    }
+
+    fun onMarkersListCreate() {
         markersOptions.value = markersRepository.getMarkersList()
     }
 

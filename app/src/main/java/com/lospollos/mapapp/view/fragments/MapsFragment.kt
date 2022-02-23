@@ -25,12 +25,12 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.lospollos.mapapp.R
 
-import com.lospollos.mapapp.Constants.INTERVAL_TIME_IN_MILLIS
 import com.lospollos.mapapp.Constants.MY_PERMISSIONS_REQUEST_LOCATION
 import com.lospollos.mapapp.Constants.ZOOM_VALUE
 import com.google.android.gms.tasks.OnSuccessListener
 import com.lospollos.mapapp.App
 import com.lospollos.mapapp.Constants
+import com.lospollos.mapapp.view.activity.MainActivity
 import com.lospollos.mapapp.viewmodels.MapViewModel
 
 
@@ -41,7 +41,7 @@ class MapsFragment : Fragment() {
     private lateinit var mapViewModel: MapViewModel
     private val markers = ArrayList<Marker>()
 
-    private fun setMarkerOnLocation(location: Location) : Marker {
+    private fun setMarkerOnLocation(location: Location): Marker {
         val latLng = LatLng(location.latitude, location.longitude)
         val markerOptions = MarkerOptions()
         markerOptions.position(latLng)
@@ -64,6 +64,13 @@ class MapsFragment : Fragment() {
             markers.clear()
             mapViewModel.onDeleteButtonClick()
             googleMap.clear()
+        }
+
+        val showMarkersButton = activity?.findViewById<Button>(R.id.all_markers_button)
+        showMarkersButton?.setOnClickListener {
+            mapViewModel.onAllMarkersButtonClick(markers)
+            (activity as MainActivity).navController
+                .navigate(R.id.action_mapsFragment_to_allMarkersFragment)
         }
 
         mFusedLocationClient?.lastLocation?.addOnSuccessListener(activity!!) { location ->
@@ -174,16 +181,17 @@ class MapsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //App.context.getSharedPreferences(Constants.SP_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+        //context.getSharedPreferences(SP_NAME, MODE_PRIVATE).edit().clear().apply()
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mFusedLocationClient = activity?.let { LocationServices.getFusedLocationProviderClient(it) }
         mapFragment?.getMapAsync(callback)
         mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mapViewModel.onFragmentDestroy(markers)
+    override fun onPause() {
+        super.onPause()
+        mapViewModel.onFragmentPause(markers)
+        markers.clear()
     }
 
 }
