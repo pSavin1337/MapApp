@@ -17,7 +17,6 @@ import com.lospollos.mapapp.data.MarkersRepository
 class MapViewModel : ViewModel() {
 
     private val markersRepository = MarkersRepository()
-    lateinit var markersList: List<Marker>
 
     val markersOptions = MutableLiveData<List<MarkerOptions>>()
     val permissionsGranted = MutableLiveData<Boolean>()

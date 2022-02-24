@@ -30,40 +30,37 @@ import com.lospollos.mapapp.Constants.ZOOM_VALUE
 import com.google.android.gms.tasks.OnSuccessListener
 import com.lospollos.mapapp.App
 import com.lospollos.mapapp.Constants
+import com.lospollos.mapapp.view.IMap
 import com.lospollos.mapapp.view.activity.MainActivity
 import com.lospollos.mapapp.viewmodels.MapViewModel
 
 
 class MapsFragment : Fragment() {
 
-    private lateinit var googleMap: GoogleMap
-    private var mFusedLocationClient: FusedLocationProviderClient? = null
+    private var map: IMap = GoogleIMapImpl()
     private lateinit var mapViewModel: MapViewModel
     private val markers = ArrayList<Marker>()
 
-    private fun setMarkerOnLocation(location: Location): Marker {
-        val latLng = LatLng(location.latitude, location.longitude)
-        val markerOptions = MarkerOptions()
-        markerOptions.position(latLng)
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-        return googleMap.addMarker(markerOptions)!!
-    }
-
-    @SuppressLint("MissingPermission")
-    fun onPermissionsGrantedCallback() {
+    private fun onPermissionsGrantedCallback() {
 
         mapViewModel.onMapCreate()
         mapViewModel.markersOptions.observe(viewLifecycleOwner) { markersOptionsList ->
             markersOptionsList.forEach {
-                markers.add(googleMap.addMarker(it)!!)
+                markers.add(
+                    map.addMarker(
+                        it.position.latitude,
+                        it.position.longitude,
+                        BitmapDescriptorFactory.HUE_RED
+                    )
+                )
             }
         }
 
         val deleteMarkersButton = activity?.findViewById<Button>(R.id.delete_markers_button)
         deleteMarkersButton?.setOnClickListener {
             markers.clear()
+            map.clearMap()
             mapViewModel.onDeleteButtonClick()
-            googleMap.clear()
         }
 
         val showMarkersButton = activity?.findViewById<Button>(R.id.all_markers_button)
@@ -73,47 +70,21 @@ class MapsFragment : Fragment() {
                 .navigate(R.id.action_mapsFragment_to_allMarkersFragment)
         }
 
-        mFusedLocationClient?.lastLocation?.addOnSuccessListener(activity!!) { location ->
-            if (location != null) {
-                val latLng = LatLng(location.latitude, location.longitude)
-                val cameraPosition = CameraPosition.Builder()
-                    .target(latLng)
-                    .zoom(ZOOM_VALUE)
-                    .build()
-                val cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition)
-                googleMap.animateCamera(cameraUpdate)
-            }
+        map.doOnGettingCurrentLocation(activity!!) { location ->
+            map.zoomCamera(location.latitude, location.longitude)
         }
         val button = activity?.findViewById<Button>(R.id.new_marker_button)
         button?.setOnClickListener {
-            mFusedLocationClient?.lastLocation?.addOnSuccessListener(activity!!) { location ->
-                if (location != null) {
-                    markers.add(setMarkerOnLocation(location))
-                }
+            map.doOnGettingCurrentLocation(activity!!) { location ->
+                markers.add(
+                    map.addMarker(
+                        location.latitude,
+                        location.longitude,
+                        BitmapDescriptorFactory.HUE_GREEN
+                    )
+                )
             }
         }
-        googleMap.isMyLocationEnabled = true
-    }
-
-    @SuppressLint("MissingPermission")
-    private val callback = OnMapReadyCallback { map ->
-
-        this.googleMap = map
-        googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(
-                    context!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                onPermissionsGrantedCallback()
-            } else {
-                checkLocationPermission()
-            }
-        } else {
-            onPermissionsGrantedCallback()
-        }
-
     }
 
     private fun checkLocationPermission() {
@@ -151,7 +122,6 @@ class MapsFragment : Fragment() {
         }
     }
 
-    @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -182,9 +152,22 @@ class MapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //context.getSharedPreferences(SP_NAME, MODE_PRIVATE).edit().clear().apply()
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mFusedLocationClient = activity?.let { LocationServices.getFusedLocationProviderClient(it) }
-        mapFragment?.getMapAsync(callback)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map)
+        map.getMap(mapFragment!!) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(
+                        context!!,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    onPermissionsGrantedCallback()
+                } else {
+                    checkLocationPermission()
+                }
+            } else {
+                onPermissionsGrantedCallback()
+            }
+        }
         mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
     }
 
